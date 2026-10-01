@@ -5,7 +5,7 @@ import { EXPERIENCE } from "@/content/data";
 
 export default function ExperienceSection() {
   return (
-    <section id="experience" className="scroll-mt-24 pt-32 lg:pt-0">
+    <section id="experience" className="scroll-mt-24 pt-32 lg:pt-16">
       <SectionLabel index="02">Experience</SectionLabel>
       <ol className="space-y-4">
         {EXPERIENCE.map((job, i) => (
@@ -16,9 +16,12 @@ export default function ExperienceSection() {
               </span>
               <div>
                 <h3 className="font-heading text-lg font-medium">
-                  {job.role} <span className="text-muted-foreground">· {job.org}</span>
+                  {job.role}{" "}
+                  <span className="text-muted-foreground">· {job.org}</span>
                 </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{job.summary}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {job.summary}
+                </p>
                 <TechList items={job.tech} />
               </div>
             </li>
