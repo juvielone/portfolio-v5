@@ -16,8 +16,9 @@ No Base44 code, SDK, auth, or tooling should remain or be reintroduced.
 - Deployed on Vercel
 
 ## How to work with me
-- Before modifying files, running git commands, or deploying: explain the plan
-  and wait for my explicit go.
+- Before implementing anything (modifying files, running git commands, or
+  deploying): first tell me the plan, then stop and wait for my explicit go
+  signal. Never start implementing in the same message as the plan.
 - Ask clarifying questions only when necessary — for major changes, direction
   changes, or when I ask. Don't expand scope beyond what I requested.
 - Don't add new dependencies without asking.
