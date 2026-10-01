@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --primary: 184 100% 25%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 215 16% 42%;
+  --accent: 184 60% 94%;
+  --accent-foreground: 184 100% 20%;
+  --border: 214 32% 89%;
+  --spotlight: rgba(0, 122, 130, 0.08);
+}
+
+.dark {
+  --background: 216 33% 3%;
+  --foreground: 214 32% 91%;
+  --card: 213 24% 7%;
+  --primary: 172 66% 50%;
+  --primary-foreground: 216 33% 3%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 172 40% 12%;
+  --accent-foreground: 172 66% 60%;
+  --border: 215 20% 14%;
+  --spotlight: rgba(45, 212, 191, 0.09);
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-border: hsl(var(--border));
+
+  --font-heading: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --animate-hero-in: hero-in 1s ease both;
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    line-height: 1.6;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
