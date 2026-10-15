@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "hero:frames": "node scripts/extract-hero-frames.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "framer-motion": "^13.5.0",
