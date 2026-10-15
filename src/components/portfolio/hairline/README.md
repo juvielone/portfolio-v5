@@ -35,3 +35,7 @@ Plus any `<div>` attribute. Theming uses the same `--hairline-*` CSS variables a
 - `figures/riffle.ts`: the engine takes the count; hole size follows the zoom.
 - `riffle-figure.ts`, `Riffle.tsx`: new entry and React component with `count`.
 - `core/`, `mount.ts`, `intensity.ts`: unchanged copies of the library's engine.
+
+## Stack
+
+`figures/stack.ts` and `slab.ts` are unchanged copies from `@lucasmarkes/hairline` 0.5.1; `stack-figure.ts` and `Stack.tsx` are the library's entry and React wrapper cut down to this one figure. It shares the engine above.
