@@ -1,6 +1,6 @@
-import { clamp, rad, type Vec2 } from "../core/iso";
+import type { Vec2 } from "../core/iso";
 import { tdone, tset, tval, tween, type Tween } from "../core/motion";
-import { BACK, FWD, G, H, LIFT, REST, W, card, pose, scene, tray } from "./riffle-geometry";
+import { BACK, FWD, LIFT, REST, W, card, pose, scene, top, tray } from "./riffle-geometry";
 import { disposer, mk, place, pointer, reflect, register, type FigureEls, type FigureHandle, type FigureMount } from "../core/stage";
 
 /**
@@ -18,7 +18,8 @@ import { disposer, mk, place, pointer, reflect, register, type FigureEls, type F
  * riffle-geometry.ts; this file is the DOM, the tweens and the input.
  *
  * Modified from @lucasmarkes/hairline (MIT): `engine(N)` makes the engine for
- * N cards (already clamped by the caller) instead of a fixed eight.
+ * N cards (already clamped by the caller) instead of a fixed eight, and a
+ * `rest` card can stay pulled when nothing points at the tray.
  */
 
 type Card = {
@@ -29,7 +30,10 @@ type Card = {
   a: Tween; z: Tween;
 };
 
-export const engine = (N: number): FigureMount => ({ stage, svg, read }: FigureEls, value: number): FigureHandle => {
+/** The card the tray rests on, shared with whoever made the engine: they set `card`, the engine sets `apply` to hear a change. */
+export type Rest = { card: number; apply?: (card: number) => void };
+
+export const engine = (N: number, rest: Rest = { card: -1 }): FigureMount => ({ stage, svg, read }: FigureEls, value: number): FigureHandle => {
   const bag = disposer();
   let stag = value;
 
@@ -55,17 +59,25 @@ export const engine = (N: number): FigureMount => ({ stage, svg, read }: FigureE
   for (const [d, cls] of paths.near) mk("path", { d, class: cls }, g);
 
   // hit bands: oblique strips along the RESTING top edges. They never move.
-  const top = (i: number) => P(W / 2, i * G + H * Math.sin(rad(REST)), H * Math.cos(rad(REST)));
-  const c0 = top(0), c1 = top(1), d = [c1[0] - c0[0], c1[1] - c0[1]];
+  const c0 = top(P, 0), c1 = top(P, 1), d = [c1[0] - c0[0], c1[1] - c0[1]];
   const px0 = P(0, 0, 0), px1 = P(1, 0, 0), ex = [px1[0] - px0[0], px1[1] - px0[1]];
-  const HALF = W / 2 + 6, det = d[0] * ex[1] - d[1] * ex[0];
+  const HALF = W / 2 + 14, det = d[0] * ex[1] - d[1] * ex[0];
+
+  // the outer cards give EDGE of their bands to their inner neighbours; the pulled card holds on for STICK past its own
+  const EDGE = 0.3, STICK = 0.35;
+  /** Where card i's band starts along s. */
+  const lo = (i: number) =>
+    i <= 0 ? -Infinity : i >= N ? Infinity : i - 0.5 + (N > 2 ? (i === 1 ? -EDGE : i === N - 1 ? EDGE : 0) : 0);
 
   /** The card whose band holds the point, in the band's own (s, r) coordinates; -1 outside. */
   function hit([x, y]: Vec2) {
     const qx = x - c0[0], qy = y - c0[1];
     const s = (qx * ex[1] - qy * ex[0]) / det, r = (d[0] * qy - d[1] * qx) / det;
-    if (Math.abs(r) > HALF || s < -0.5 || s > N + 1) return -1;
-    return clamp(Math.round(s), 0, N - 1);
+    if (Math.abs(r) > HALF || s < -2 || s > N + 3) return -1;
+    if (act >= 0 && s >= lo(act) - STICK && s < lo(act + 1) + STICK) return act;
+    let i = 0;
+    while (i < N - 1 && s >= lo(i + 1)) i++;
+    return i;
   }
 
   function draw(i: number, th: number, lift: number) {
@@ -101,18 +113,31 @@ export const engine = (N: number): FigureMount => ({ stage, svg, read }: FigureE
     B.wake();
   }
 
-  bag.add(pointer(stage, { move: (p) => setActive(hit(p)), leave: () => setActive(-1) }));
+  /* the card that stays pulled when nothing points at the tray; -1 lets them all rest */
+  let homeCard = -1, pointing = false;
+  const home = () => (homeCard >= 0 && homeCard < N ? homeCard : -1);
+  bag.add(pointer(stage, {
+    move: (p) => { pointing = true; const h = hit(p); setActive(h < 0 ? home() : h); },
+    leave: () => { pointing = false; setActive(home()); },
+  }));
   bag.on(stage, "keydown", (e) => {
     if (e.key === "ArrowLeft" || e.key === "ArrowDown") { setActive(act < 0 ? N - 1 : Math.min(N - 1, act + 1)); e.preventDefault(); }
     else if (e.key === "ArrowRight" || e.key === "ArrowUp") { setActive(act < 0 ? N - 1 : Math.max(0, act - 1)); e.preventDefault(); }
-    // Escape puts a pulled card back and claims the key; at rest it passes on to the page.
-    else if (e.key === "Escape" && act >= 0) { setActive(-1); e.preventDefault(); }
+    // Escape puts a pulled card back and claims the key; at home it passes on to the page.
+    else if (e.key === "Escape" && act !== home()) { setActive(home()); e.preventDefault(); }
   });
-  bag.on(stage, "blur", () => setActive(-1));
+  bag.on(stage, "blur", () => setActive(home()));
   bag.add(() => svg.replaceChildren());
+
+  /* a new home is pulled at once, unless a pointer or the keyboard holds another card */
+  rest.apply = (card: number) => {
+    homeCard = card;
+    if (!pointing && !stage.contains(stage.ownerDocument.activeElement)) setActive(home());
+  };
+  rest.apply(rest.card);
 
   return {
     set: (v) => { stag = v; },
-    destroy: bag.dispose,
+    destroy: () => { rest.apply = undefined; bag.dispose(); },
   };
 };

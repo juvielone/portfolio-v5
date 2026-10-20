@@ -195,7 +195,7 @@ export type PointerHandlers = {
 /** The handlers each stage's pointer() was given, so a tour can drive them. */
 const handlers = new WeakMap<Element, PointerHandlers>();
 /** The tour on each stage, told when a real pointer arrives and leaves. */
-const touring = new WeakMap<Element, { hold(): void; release(): void }>();
+const touring = new WeakMap<Element, { hold(meant: boolean): void; release(): void }>();
 
 /**
  * Pointer input in viewBox units. A mouse leaving acts at once; a finger
@@ -210,11 +210,12 @@ export function pointer(stage: HTMLElement, on: PointerHandlers): () => void {
     const r = stage.getBoundingClientRect();
     return [((e.clientX - r.left) / r.width) * 400, ((e.clientY - r.top) / r.height) * 320];
   };
-  /* a real pointer holds the stage's tour before the figure hears it, and frees it after the figure hears the leave */
-  const move = (e: PointerEvent) => { clearTimeout(tm); touring.get(stage)?.hold(); on.move(pt(e), e); };
+  /* a real pointer holds the stage's tour before the figure hears it, and frees it after the figure hears the leave;
+     a move without movement is the page scrolling under a still pointer, not a hand */
+  const move = (e: PointerEvent) => { clearTimeout(tm); touring.get(stage)?.hold(!!(e.movementX || e.movementY)); on.move(pt(e), e); };
   const down = (e: PointerEvent) => {
     clearTimeout(tm);
-    touring.get(stage)?.hold();
+    touring.get(stage)?.hold(true);
     if (e.pointerType !== "mouse") stage.releasePointerCapture?.(e.pointerId);
     if (on.down) on.down(pt(e), e); else on.move(pt(e), e);
   };
@@ -239,10 +240,12 @@ export function pointer(stage: HTMLElement, on: PointerHandlers): () => void {
 /** Where an unseen pointer stops: a viewBox point, or null to leave the stage. */
 export type Tour = ReadonlyArray<Vec2 | null>;
 export type TourHandle = { stop(): void };
+/** How long, in ms, the unseen pointer takes between stops and waits at each. */
+export type Pace = { travel: number; dwell: number };
 /** The default stops: a diamond around the centre, left, up, right, down, then a leave. */
 export const LAP: Tour = [[128, 150], [200, 118], [272, 150], [200, 206], null];
 
-const TRAVEL = 900, DWELL = 1200, REST = 1800, RESUME = 1200, STAGGER = 450;
+const TRAVEL_MS = 900, DWELL_MS = 1200, REST = 1800, RESUME = 1200, STAGGER = 450;
 const GHOST = { pointerType: "ghost" } as PointerEvent;
 /** How many tours have started on the page: the stagger that keeps a page of them out of step. */
 let started = 0;
@@ -263,20 +266,24 @@ function entry([x, y]: Vec2): Vec2 {
  * starts from the first stop. It is a board in the one loop: it sleeps offscreen
  * and leaves under reduced motion. onStop(i) is called on arriving at stop i,
  * or on leaving for a null stop i. A figure never calls this; the bench and the
- * package do.
+ * package do. With `once` it walks one lap and is done; a hand that moves,
+ * presses or focuses first ends it too. `pace` replaces TRAVEL and DWELL.
  */
-export function tour(stage: HTMLElement, stops: Tour, onStop?: (index: number) => void): TourHandle {
+export function tour(
+  stage: HTMLElement, stops: Tour, onStop?: (index: number) => void, once = false,
+  { travel: TRAVEL, dwell: DWELL }: Pace = { travel: TRAVEL_MS, dwell: DWELL_MS },
+): TourHandle {
   let i = 0;                                            // the stop the ghost is heading to
   let wait = RESUME + STAGGER * (started++ % 4);        // ms before the next travel begins
   let t = -1;                                           // ms into the travel; -1 before it begins
   let at: Vec2 | null = null;                           // where the ghost is; null when off the stage
   let origin: Vec2 = [200, 320];                        // where the current travel began
   let hand = false, keys = stage.contains(stage.ownerDocument.activeElement);
-  let gone = false;
+  let gone = false, done = once && keys;
 
   const leave = () => { at = null; t = -1; handlers.get(stage)?.leave(GHOST); };
   const tick: Tick = (dt) => {
-    if (hand || keys || !stops.length) return false;
+    if (done || hand || keys || !stops.length) return false;
     if (reducedMotion()) { if (at) leave(); return false; }
     if (wait > 0) { wait -= dt * 1000; return true; }
     const stop = stops[i];
@@ -285,6 +292,7 @@ export function tour(stage: HTMLElement, stops: Tour, onStop?: (index: number) =
       onStop?.(i);
       i = (i + 1) % stops.length;
       wait = REST;
+      if (once && i === 0) { done = true; return false; }
       return true;
     }
     const h = handlers.get(stage);
@@ -303,13 +311,13 @@ export function tour(stage: HTMLElement, stops: Tour, onStop?: (index: number) =
   };
 
   /* a hand or the keyboard owns the handlers: the ghost drops where it was and says nothing until both are gone */
-  const take = () => { at = null; t = -1; };
-  const give = () => { if (hand || keys) return; i = 0; t = -1; wait = RESUME; board.wake(); };
+  const take = (meant: boolean) => { at = null; t = -1; if (once && meant) done = true; };
+  const give = () => { if (done || hand || keys) return; i = 0; t = -1; wait = RESUME; board.wake(); };
   const me = {
-    hold: () => { hand = true; take(); },
+    hold: (meant: boolean) => { hand = true; take(meant); },
     release: () => { if (!hand) return; hand = false; give(); },
   };
-  const focusIn = () => { keys = true; take(); };
+  const focusIn = () => { keys = true; take(true); };
   const focusOut = (e: FocusEvent) => { if (keys && !stage.contains(e.relatedTarget as Node | null)) { keys = false; give(); } };
   stage.addEventListener("focusin", focusIn);
   stage.addEventListener("focusout", focusOut);

@@ -20,7 +20,7 @@ export type RiffleProps = RiffleOptions & Omit<ComponentPropsWithoutRef<"div">, 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export const Riffle = forwardRef<HTMLDivElement, RiffleProps>(function Riffle(props, ref) {
-  const { count, intensity, theme, label, onRead, play, style, ...attrs } = props;
+  const { count, selected, intensity, theme, label, onRead, play, style, ...attrs } = props;
   /* aria-label stays on the div and is the figure's label too, so the two never disagree about the name */
   const named = label ?? props["aria-label"];
 
@@ -36,7 +36,7 @@ export const Riffle = forwardRef<HTMLDivElement, RiffleProps>(function Riffle(pr
   useIsoLayoutEffect(() => { read.current = onRead; });
 
   useIsoLayoutEffect(() => {
-    const f = riffle(el.current!, { count, intensity, theme, label: named, play, onRead: (text) => read.current?.(text) });
+    const f = riffle(el.current!, { count, selected, intensity, theme, label: named, play, onRead: (text) => read.current?.(text) });
     figure.current = f;
     return () => { f.destroy(); figure.current = null; };
     // mounts once; options (count included) reach the figure through the effect below
@@ -44,7 +44,7 @@ export const Riffle = forwardRef<HTMLDivElement, RiffleProps>(function Riffle(pr
   }, []);
 
   /* every key is sent, so a prop that was removed goes back to its default */
-  useIsoLayoutEffect(() => { figure.current?.update({ count, intensity, theme, label: named, play } as RiffleOptions); }, [count, intensity, theme, named, play]);
+  useIsoLayoutEffect(() => { figure.current?.update({ count, selected, intensity, theme, label: named, play } as RiffleOptions); }, [count, selected, intensity, theme, named, play]);
 
   return <div {...attrs} ref={set} style={{ aspectRatio: "5 / 4", ...style }} />;
 });

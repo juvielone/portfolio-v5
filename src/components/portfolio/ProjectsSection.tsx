@@ -11,7 +11,11 @@ export default function ProjectsSection() {
       return [
         id,
         <div key={id} className="grid gap-6">
-          {items.length === 0 && <p className="text-sm text-muted-foreground">No projects here yet.</p>}
+          {items.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No projects here yet.
+            </p>
+          )}
           {items.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.05}>
               <ProjectCard project={p} />

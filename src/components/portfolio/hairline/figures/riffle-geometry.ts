@@ -2,6 +2,7 @@ import {
   Cam, facing, fillet, fit, hull, open, poly, proj, rad, ringAt, rrect, run, seg,
   type Camera, type Projector, type Ring, type Sample, type Vec2,
 } from "../core/iso";
+import type { Tour } from "../core/stage";
 
 /**
  * Riffle's drawing, with no DOM: the camera, the tray and a card in any pose,
@@ -139,6 +140,22 @@ export function pose(P: Projector, i: number, t0: number, shape: readonly Vec2[]
     punch,
   };
 }
+
+/** The middle of card i's top edge, at rest. */
+export const top = (P: Projector, i: number) => P(W / 2, i * G + H * Math.sin(rad(REST)), H * Math.cos(rad(REST)));
+
+/**
+ * A tour of n cards: each one's top edge, back to front, then off the stage.
+ * Walked at DOMINO's pace, the cards tip back one after another and stand up again.
+ */
+export function lap(n: number): Tour {
+  const { P } = scene(n);
+  // spread out from the middle, so each stop clears the band of the card pulled before it
+  return [...Array.from({ length: n }, (_, i) => top(P, i + (i - (n - 1) / 2) * 0.5)), null];
+}
+
+/** A quick walk for lap(): the cards' own staggered tweens run the pulls together. */
+export const DOMINO = { travel: 260, dwell: 140 };
 
 /** The fitted camera, its projector and facing test, and the tray's rings: what both the engine and the still start from. */
 export function scene(n: number) {

@@ -61,7 +61,7 @@ export const EXPERIENCE: Job[] = [
 ];
 
 export const CATEGORIES: Category[] = [
-  { id: "main", label: "Main Projects" },
+  { id: "main", label: "Main" },
   { id: "freelance", label: "Freelance" },
   { id: "personal", label: "Personal" },
 ];

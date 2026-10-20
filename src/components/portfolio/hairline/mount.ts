@@ -1,5 +1,5 @@
 import { inject } from "./core/styles";
-import { LAP, tour, type FigureHandle, type FigureMount, type Readout, type Tour, type TourHandle } from "./core/stage";
+import { LAP, tour, type FigureHandle, type FigureMount, type Pace, type Readout, type Tour, type TourHandle } from "./core/stage";
 import { parameter, type FigureId } from "./intensity";
 
 /**
@@ -23,10 +23,11 @@ export type HairlineOptions = {
   onRead?: (text: string) => void;
   /**
    * Walks the figure through its answer on its own, in a loop, until the
-   * pointer or focus arrives; it resumes after they leave. Only `true` plays.
-   * Under prefers-reduced-motion the figure rests. Default false.
+   * pointer or focus arrives; it resumes after they leave. `"once"` walks a
+   * single lap the first time it is in view and never resumes. Only `true`
+   * and `"once"` play. Under prefers-reduced-motion the figure rests. Default false.
    */
-  play?: boolean;
+  play?: boolean | "once";
 };
 
 export type Figure = {
@@ -48,9 +49,13 @@ export type Spec = {
   focusable?: boolean;
   /** Where play stops, in viewBox units; null leaves the stage. LAP when unset. */
   tour?: Tour;
+  /** How quickly play walks its stops. The tour's own pace when unset. */
+  pace?: Pace;
 };
 
 const NS = "http://www.w3.org/2000/svg";
+/** Only `true` and `"once"` play. */
+const playMode = (play: unknown): true | "once" | false => (play === true || play === "once" ? play : false);
 const mounted = new WeakMap<Element, () => void>();
 
 /** An error from a consumer's callback, reported as uncaught without unwinding the frame loop every figure shares. */
@@ -119,7 +124,9 @@ export function create(spec: Spec, el: HTMLElement, options?: HairlineOptions): 
 
   let value = parameter(spec.id, opts.intensity);
   /* the tour registers before the engine, so its board ticks first in a frame: the ghost moves, then the engine draws the answer */
-  playing = opts.play === true ? tour(el, spec.tour ?? LAP) : null;
+  const play = (m: true | "once" | false) => (m ? tour(el, spec.tour ?? LAP, undefined, m === "once", spec.pace) : null);
+  let mode = playMode(opts.play);
+  playing = play(mode);
   let engine: FigureHandle;
   try { engine = spec.engine({ stage: el, svg, read }, value); } catch (err) { playing?.stop(); throw err; }
   if (text === null) read.textContent = spec.rest;
@@ -150,10 +157,11 @@ export function create(spec: Spec, el: HTMLElement, options?: HairlineOptions): 
       }
       const v = parameter(spec.id, opts.intensity);
       if (v !== value) { value = v; engine.set(v); }
-      const play = opts.play === true;
-      if (play !== !!playing) {
+      const m = playMode(opts.play);
+      if (m !== mode) {
+        mode = m;
         playing?.stop();
-        playing = play ? tour(el, spec.tour ?? LAP) : null;
+        playing = play(mode);
       }
       dress();
     },

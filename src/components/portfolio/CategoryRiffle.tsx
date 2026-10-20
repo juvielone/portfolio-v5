@@ -26,7 +26,7 @@ export default function CategoryRiffle({ value, onChange }: Props) {
   return (
     <div className="flex flex-col items-center gap-2">
       <div
-        className="w-36 cursor-pointer sm:w-60"
+        className="w-48 cursor-pointer sm:w-64"
         style={{ "--hairline-hi": HI[shown] } as CSSProperties}
         onClick={pick}
         onKeyDown={(e) => {
@@ -36,7 +36,7 @@ export default function CategoryRiffle({ value, onChange }: Props) {
           }
         }}
       >
-        <Riffle count={3} intensity={0.6} aria-label="Choose project category" onRead={(t) => setHover(toIndex(t))} />
+        <Riffle count={3} selected={selected + 1} play="once" intensity={0.6} aria-label="Choose project category" onRead={(t) => setHover(toIndex(t))} />
       </div>
     </div>
   );
