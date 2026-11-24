@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Drawing Set sketch</title>
+<style>
+  :root { --film:#F2F5F8; --line:#1B2633; --rev:#B83A0E; --mute:#5A6878; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { width:1440px; height:900px; background:var(--film); color:var(--line);
+    font-family:"Archivo Narrow","Arial Narrow",Arial,sans-serif; overflow:hidden; }
+  .sheet { position:absolute; inset:28px; border:3px solid var(--line); }
+  .inner { position:absolute; inset:22px; border:1px solid var(--line); }
+  .ref { position:absolute; font-size:12px; font-weight:700; }
+  .grid-top { position:absolute; top:4px; left:22px; right:22px; display:flex; justify-content:space-around; font-size:12px; font-weight:700; }
+  .grid-left { position:absolute; left:6px; top:22px; bottom:22px; display:flex; flex-direction:column; justify-content:space-around; font-size:12px; font-weight:700; }
+  .register { position:absolute; top:0; left:0; right:0; height:52px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:36px; padding:0 24px; font-size:14px; font-weight:700; letter-spacing:.04em; }
+  .register .on { border-bottom:3px solid var(--rev); padding-bottom:2px; }
+  .plans { position:absolute; top:52px; left:0; right:420px; bottom:0; display:grid; grid-template-columns:1fr 1fr; }
+  .plan { border-right:1px solid var(--line); padding:28px 28px; position:relative; }
+  .plan h3 { font-size:15px; letter-spacing:.06em; font-weight:700; }
+  .plan .sub { font-size:13px; color:var(--mute); margin-top:4px; }
+  .node { position:absolute; border:1.5px solid var(--line); background:var(--film); padding:10px 12px; font-size:13px; font-weight:700; width:150px; }
+  .wire { position:absolute; background:var(--line); }
+  .cloud { position:absolute; border:2.5px solid var(--rev); border-radius:40px; }
+  .revtag { position:absolute; width:30px; height:26px; background:var(--rev); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; clip-path:polygon(50% 0,100% 100%,0 100%); padding-top:8px; }
+  .note { position:absolute; font-size:12px; color:var(--rev); font-weight:700; max-width:200px; }
+  .title { position:absolute; right:0; bottom:0; width:420px; top:52px; border-left:2px solid var(--line); display:grid; grid-template-rows:1fr auto auto auto auto; }
+  .title .name { padding:28px 24px; border-bottom:1px solid var(--line); }
+  .title .name small { font-size:12px; font-weight:700; letter-spacing:.06em; color:var(--mute); }
+  .title .name h1 { font-size:76px; line-height:.92; letter-spacing:-.02em; font-weight:700; margin-top:10px; }
+  .title .name p { font-size:20px; margin-top:16px; line-height:1.3; }
+  .cell { display:grid; grid-template-columns:110px 1fr; border-bottom:1px solid var(--line); font-size:14px; }
+  .cell span { padding:12px 16px; }
+  .cell span:first-child { border-right:1px solid var(--line); font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--mute); }
+  .actions { display:grid; grid-template-columns:1fr 1fr; }
+  .actions span { padding:20px 16px; font-weight:700; font-size:16px; text-align:center; }
+  .actions span:first-child { background:var(--line); color:var(--film); }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="grid-top"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+  <div class="grid-left"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span></div>
+  <div class="inner">
+    <div class="register"><span>DRAWING REGISTER</span><span class="on">A-01 LEAD PROJECT</span><span>A-02 EXPERIENCE</span><span>A-03 PROJECTS</span><span>A-04 CONTACT</span></div>
+    <div class="plans">
+      <div class="plan">
+        <h3>EXISTING CONDITION</h3><div class="sub">How the business worked before · placeholder</div>
+        <div class="node" style="top:120px;left:40px">Email enquiry</div>
+        <div class="wire" style="top:142px;left:190px;width:60px;height:1.5px"></div>
+        <div class="node" style="top:120px;left:250px">Copy to sheet</div>
+        <div class="wire" style="top:165px;left:325px;width:1.5px;height:90px"></div>
+        <div class="node" style="top:255px;left:250px">Price by hand</div>
+        <div class="wire" style="top:277px;left:190px;width:60px;height:1.5px"></div>
+        <div class="node" style="top:255px;left:40px">Re-check totals</div>
+        <div class="wire" style="top:300px;left:115px;width:1.5px;height:90px"></div>
+        <div class="node" style="top:390px;left:40px">Send PDF quote</div>
+        <div class="note" style="top:460px;left:40px">Four hand-offs. Placeholder problem, replaced with the real one.</div>
+      </div>
+      <div class="plan">
+        <h3>PROPOSED · AS BUILT</h3><div class="sub">The app that replaced it · placeholder</div>
+        <div class="node" style="top:120px;left:40px">Enquiry form</div>
+        <div class="wire" style="top:165px;left:115px;width:1.5px;height:90px"></div>
+        <div class="node" style="top:255px;left:40px">Auto-priced quote</div>
+        <div class="cloud" style="top:232px;left:18px;width:200px;height:86px"></div>
+        <div class="revtag" style="top:224px;left:226px">1</div>
+        <div class="wire" style="top:300px;left:115px;width:1.5px;height:90px"></div>
+        <div class="node" style="top:390px;left:40px">Sent &amp; tracked</div>
+        <div class="note" style="top:248px;left:270px">REV 1 — pricing rules moved into the app.</div>
+      </div>
+    </div>
+    <div class="title">
+      <div class="name"><h1>Juvie<br>Lagos</h1><p>Full-stack developer, Sydney. I map how a business works, then build the app that fixes the broken step.</p></div>
+      <div class="cell"><span>DRAWN BY</span><span>Juvielone Lagos</span></div>
+      <div class="cell"><span>STACK</span><span>Next.js · TypeScript · C#/.NET</span></div>
+      <div class="cell"><span>LOCATION</span><span>Sydney · AEDT 14:32</span></div>
+      <div class="cell"><span>SHEET</span><span>A-01 of A-04 · Placeholder content</span></div>
+      <div class="actions"><span>Email me</span><span>Résumé (PDF)</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

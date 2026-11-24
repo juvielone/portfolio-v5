@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Operating Review sketch</title>
+<style>
+  :root { --paper:#F6F6F3; --ink:#111111; --field:#FFD23F; --mute:#55554F; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { width:1440px; height:900px; background:var(--paper); color:var(--ink);
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif; overflow:hidden; font-variant-numeric:tabular-nums; }
+  .page { display:grid; grid-template-columns:repeat(12,1fr); column-gap:24px; padding:0 48px; height:900px;
+    grid-template-rows:72px 1fr 64px; }
+  .rule { position:absolute; left:48px; right:48px; height:2px; background:var(--ink); }
+  header { grid-column:1/-1; display:grid; grid-template-columns:repeat(12,1fr); column-gap:24px; align-items:end; padding-bottom:14px; border-bottom:2px solid var(--ink); }
+  header .mark { grid-column:1/5; font-weight:800; font-size:15px; letter-spacing:.02em; }
+  header nav { grid-column:5/12; display:flex; gap:40px; font-size:14px; }
+  header nav b { font-weight:800; margin-right:8px; }
+  header .yr { grid-column:12/13; text-align:right; font-weight:800; font-size:15px; }
+  .intro { grid-column:1/6; padding-top:56px; display:flex; flex-direction:column; }
+  .intro .idx { font-size:14px; font-weight:800; }
+  .intro h1 { font-size:112px; line-height:.9; letter-spacing:-.045em; font-weight:800; margin-top:20px; }
+  .intro .role { font-size:30px; line-height:1.15; font-weight:500; margin-top:28px; letter-spacing:-.01em; }
+  .intro p { font-family:Georgia,"Source Serif 4",serif; font-size:19px; line-height:1.5; color:var(--mute); margin-top:24px; max-width:470px; }
+  .ctas { display:flex; gap:12px; margin-top:auto; padding-bottom:40px; }
+  .btn { font-weight:800; font-size:16px; padding:16px 26px; border:2px solid var(--ink); }
+  .btn.solid { background:var(--ink); color:var(--paper); }
+  .person { display:flex; gap:14px; align-items:center; margin-top:28px; font-size:13px; }
+  .person i { width:56px; height:56px; background:#222; display:block; }
+  .case { grid-column:6/13; background:var(--field); margin-top:32px; margin-bottom:32px; padding:36px 40px; display:grid; grid-template-rows:auto auto 1fr auto; }
+  .case .top { display:flex; justify-content:space-between; font-weight:800; font-size:14px; border-bottom:2px solid var(--ink); padding-bottom:12px; }
+  .case h2 { font-size:52px; line-height:1; letter-spacing:-.035em; font-weight:800; margin-top:24px; }
+  .case .origin { font-family:Georgia,serif; font-size:19px; line-height:1.45; margin-top:14px; max-width:620px; }
+  .chart { margin-top:24px; border-top:2px solid var(--ink); padding-top:16px; }
+  .toggle { display:flex; gap:0; font-weight:800; font-size:13px; margin-bottom:18px; }
+  .toggle span { border:2px solid var(--ink); padding:6px 14px; }
+  .toggle span.on { background:var(--ink); color:var(--field); }
+  .steps { display:flex; align-items:center; gap:0; }
+  .step { border:2px solid var(--ink); padding:14px 12px; font-size:13px; font-weight:700; width:118px; height:64px; }
+  .step.cut { border-style:dashed; text-decoration:line-through; }
+  .arrow { width:28px; height:2px; background:var(--ink); }
+  .result { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; border-top:2px solid var(--ink); padding-top:14px; font-size:13px; }
+  .result b { display:block; font-size:28px; letter-spacing:-.02em; margin-top:4px; }
+  footer { grid-column:1/-1; border-top:2px solid var(--ink); display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="mark">Juvielone Lagos · Operating Review</div>
+    <nav><span><b>01</b>Overview</span><span><b>02</b>Experience</span><span><b>03</b>Projects</span><span><b>04</b>Contact</span></nav>
+    <div class="yr">2026</div>
+  </header>
+  <section class="intro">
+    <div class="idx">01 — Overview</div>
+    <h1>Juvie<br>Lagos</h1>
+    <div class="role">Full-stack developer, Sydney. I find where a business workflow breaks and build the app that fixes it.</div>
+    <p>Next.js, TypeScript and C#/.NET, with AI used where it saves real work. Placeholder copy until confirmed.</p>
+    <div class="person"><i></i><span>Portrait · placeholder for profile.png<br>Sydney · AEDT 14:32</span></div>
+    <div class="ctas"><span class="btn solid">Email me</span><span class="btn">Résumé (PDF)</span></div>
+  </section>
+  <section class="case">
+    <div class="top"><span>Case 01 · Main</span><span>Project name — placeholder</span></div>
+    <h2>Quotes took a day.<br>Now they take minutes.</h2>
+    <div class="origin">Origin: a small trades business building every quote by hand in spreadsheets. Placeholder problem statement, replaced with the real one.</div>
+    <div class="chart">
+      <div class="toggle"><span>Before</span><span class="on">After</span></div>
+      <div class="steps">
+        <div class="step">Enquiry in</div><div class="arrow"></div>
+        <div class="step cut">Re-type to sheet</div><div class="arrow"></div>
+        <div class="step cut">Price by hand</div><div class="arrow"></div>
+        <div class="step">Auto-priced quote</div><div class="arrow"></div>
+        <div class="step">Sent &amp; tracked</div>
+      </div>
+    </div>
+    <div class="result"><div>Role<b>Sole developer</b></div><div>Stack<b>Next.js · .NET</b></div><div>Result<b>TBD</b></div></div>
+  </section>
+  <footer><span>Continue: 02 Experience ↓</span><span>Placeholder content · not final</span></footer>
+</div>
+</body>
+</html>
